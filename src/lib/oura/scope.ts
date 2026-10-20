@@ -1,8 +1,8 @@
 /**
  * Oura collections that sit behind a scope beyond `daily` (`spo2`,
- * `heart_health`). A grant issued before HealthLog requested those scopes
- * answers 401 on exactly these, so they are the only names the settings card
- * can be asked to explain. Each has a label under
+ * `heart_health`, `stress`). A grant issued before HealthLog requested those
+ * scopes answers 401 on exactly these, so they are the only names the settings
+ * card can be asked to explain. Each has a label under
  * `settings.integrations.oura.scope.items`.
  */
 export const OURA_SCOPE_GATED_COLLECTIONS = [

@@ -276,9 +276,9 @@ const SCOPE_GATED: ReadonlySet<string> = new Set(OURA_SCOPE_GATED_COLLECTIONS);
 
 /**
  * A 401 that can be the grant's scope rather than the token: only the
- * collections behind `spo2` / `heart_health` sit outside the `daily` scope
- * every grant carries. A 401 on sleep, readiness or activity is a real auth
- * failure whatever its siblings did.
+ * collections behind `spo2` / `heart_health` / `stress` sit outside the
+ * `daily` scope every grant carries. A 401 on sleep, readiness or activity is
+ * a real auth failure whatever its siblings did.
  */
 function isScopeRefusal(f: OuraCollectionFailure): boolean {
   return SCOPE_GATED.has(f.name) && isAuthRefusal(f.err);
@@ -287,11 +287,11 @@ function isScopeRefusal(f: OuraCollectionFailure): boolean {
 /**
  * Split the scope refusals out of a run's failures once a sibling collection
  * has proven the token. Oura's authorization server enforces scopes per
- * collection, so a grant issued without `spo2` / `heart_health` answers 401 on
- * exactly the collections behind them and 200 everywhere else. Counting those
- * toward the reconnect ladder painted a working connection as broken on every
- * sync, and refreshing the token over them changed nothing. Any other failure,
- * a 401 on a core collection included, stays a failure.
+ * collection, so a grant issued without `spo2` / `heart_health` / `stress`
+ * answers 401 on exactly the collections behind them and 200 everywhere else.
+ * Counting those toward the reconnect ladder painted a working connection as
+ * broken on every sync, and refreshing the token over them changed nothing.
+ * Any other failure, a 401 on a core collection included, stays a failure.
  */
 function splitScopeDenied(
   failures: OuraCollectionFailure[],

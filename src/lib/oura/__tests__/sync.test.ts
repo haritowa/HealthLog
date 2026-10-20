@@ -968,7 +968,7 @@ describe("resolveOuraLookbackDays", () => {
   });
 });
 
-describe("syncUserOura — a grant without the spo2 / heart_health scopes", () => {
+describe("syncUserOura — a grant without the spo2 / heart_health / stress scopes", () => {
   const SCOPED = ["spo2", "vo2max", "cardio_age", "resilience"];
 
   function denyScopedCollections() {

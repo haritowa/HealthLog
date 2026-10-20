@@ -117,18 +117,19 @@ export function getOuraRedirectUri(): string {
  *   - `daily`        : readiness, sleep, daily sleep, daily activity
  *   - `personal`     : profile info
  *   - `spo2`         : `daily_spo2`
- *   - `heart_health` : `vO2_max`, `daily_cardiovascular_age`,
- *                      `daily_resilience`
+ *   - `heart_health` : `vO2_max`, `daily_cardiovascular_age`
+ *   - `stress`       : `daily_resilience`
  *
  * Oura's current authorization server enforces these per collection: a grant
- * without `spo2` or `heart_health` answers 401 on those collections while every
- * other one succeeds. The published OpenAPI security scheme (openapi-1.41)
- * lists `spo2` and `heart_health` but maps no endpoint to them; the mapping
+ * without `spo2`, `heart_health` or `stress` answers 401 on those collections
+ * while every other one succeeds. The published OpenAPI security scheme
+ * (openapi-1.41) lists these scopes but maps no endpoint to them; the mapping
  * above is what the live API enforces, as recorded by integrations that probed
  * it. Grants issued before these were requested keep the old set until the
  * user reconnects once — see `syncOuraScopeDenied`.
  */
-export const OURA_OAUTH_SCOPE = "daily personal spo2 heart_health" as const;
+export const OURA_OAUTH_SCOPE =
+  "daily personal spo2 heart_health stress" as const;
 
 export function getAuthorizationUrl(
   state: string,
