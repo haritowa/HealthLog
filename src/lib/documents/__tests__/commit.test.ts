@@ -12,6 +12,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/db", () => ({
   prisma: {
     labResult: { create: vi.fn() },
+    inboundDocument: { findFirst: vi.fn() },
   },
 }));
 
@@ -33,6 +34,7 @@ import { userDayKey } from "@/lib/tz/format";
 function observationFact(): ExtractedFact {
   return {
     id: "fact-1",
+    documentId: "doc-1",
     factType: "OBSERVATION",
     dataEncrypted: new Uint8Array(),
   } as unknown as ExtractedFact;
@@ -211,5 +213,126 @@ describe("commitApprovedFact — OBSERVATION unit integrity", () => {
     await expect(
       commitApprovedFact("user-1", observationFact()),
     ).resolves.toEqual({ recordType: "labResult", recordId: "lr-2" });
+  });
+});
+
+describe("commitApprovedFact — OBSERVATION date when the value states none", () => {
+  // A lab report that prints the collection date once in its header carries
+  // no date beside each value. Mutation check: drop the document date from
+  // `takenAt` → the report-date, filing-date and unreadable-date cases file
+  // the reading under today.
+  function undated(effectiveDate: string | null = null) {
+    vi.mocked(decryptFactData).mockReturnValue({
+      label: "Ferritin",
+      value: 80,
+      unit: "ng/mL",
+      referenceLow: null,
+      referenceHigh: null,
+      effectiveDate,
+    } as never);
+    vi.mocked(resolveOrMintBiomarker).mockResolvedValue({
+      id: "bm-3",
+      name: "Ferritin",
+      unit: "ng/mL",
+      lowerBound: null,
+      upperBound: null,
+      panel: null,
+      analyteKey: null,
+    });
+    vi.mocked(prisma.labResult.create).mockResolvedValue({
+      id: "lr-3",
+    } as never);
+  }
+
+  function document(reportDate: string | null, documentDate: string | null) {
+    vi.mocked(prisma.inboundDocument.findFirst).mockResolvedValue({
+      reportDate: reportDate ? new Date(`${reportDate}T00:00:00.000Z`) : null,
+      documentDate: documentDate
+        ? new Date(`${documentDate}T12:00:00.000Z`)
+        : null,
+    } as never);
+  }
+
+  function storedTakenAt(): Date {
+    return vi.mocked(prisma.labResult.create).mock.calls[0]![0].data
+      .takenAt as Date;
+  }
+
+  it("keeps the value's own date and never reads the document", async () => {
+    undated("2021-03-04");
+    document("2021-03-01", "2026-10-20");
+
+    await commitApprovedFact("user-1", observationFact());
+
+    expect(storedTakenAt().toISOString()).toBe("2021-03-04T12:00:00.000Z");
+    expect(prisma.inboundDocument.findFirst).not.toHaveBeenCalled();
+  });
+
+  it("takes the report date the document states over its filing date", async () => {
+    undated();
+    document("2021-03-01", "2026-10-20");
+
+    await commitApprovedFact("user-1", observationFact());
+
+    expect(storedTakenAt().toISOString()).toBe("2021-03-01T12:00:00.000Z");
+    expect(prisma.inboundDocument.findFirst).toHaveBeenCalledWith({
+      where: { id: "doc-1", userId: "user-1" },
+      select: { reportDate: true, documentDate: true },
+    });
+  });
+
+  it("takes the filing date when the document states no report date", async () => {
+    undated();
+    document(null, "2021-02-15");
+
+    await commitApprovedFact("user-1", observationFact());
+
+    expect(storedTakenAt().toISOString()).toBe("2021-02-15T12:00:00.000Z");
+  });
+
+  it("reads a value whose own date is not a calendar date as undated", async () => {
+    undated("March 2021");
+    document("2021-03-01", null);
+
+    await commitApprovedFact("user-1", observationFact());
+
+    expect(storedTakenAt().toISOString()).toBe("2021-03-01T12:00:00.000Z");
+  });
+
+  it("files the reading under now when neither the value nor the document has a date", async () => {
+    undated();
+    document(null, null);
+
+    const before = Date.now();
+    await commitApprovedFact("user-1", observationFact());
+    const after = Date.now();
+
+    const takenAt = storedTakenAt().getTime();
+    expect(takenAt).toBeGreaterThanOrEqual(before);
+    expect(takenAt).toBeLessThanOrEqual(after);
+  });
+
+  it("fails the commit when the document cannot be read, writing nothing", async () => {
+    undated();
+    vi.mocked(prisma.inboundDocument.findFirst).mockRejectedValue(
+      new Error("connection lost"),
+    );
+
+    await expect(
+      commitApprovedFact("user-1", observationFact()),
+    ).rejects.toThrow("connection lost");
+    expect(resolveOrMintBiomarker).not.toHaveBeenCalled();
+    expect(prisma.labResult.create).not.toHaveBeenCalled();
+  });
+
+  it("refuses the fact when its document is gone, writing nothing", async () => {
+    undated();
+    vi.mocked(prisma.inboundDocument.findFirst).mockResolvedValue(null);
+
+    await expect(
+      commitApprovedFact("user-1", observationFact()),
+    ).rejects.toMatchObject({ code: "document.notFound" });
+    expect(resolveOrMintBiomarker).not.toHaveBeenCalled();
+    expect(prisma.labResult.create).not.toHaveBeenCalled();
   });
 });
