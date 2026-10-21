@@ -341,6 +341,13 @@ export const ANALYTE_ALIASES: readonly AnalyteAliases[] = [
       "glucosio",
       "glukoza",
       "glikemia",
+      "глюкоза",
+      "глюкоза натощак",
+      "глюкоза крови",
+      "глюкоза в крови",
+      "глюкоза плазмы",
+      "глюкоза в плазме",
+      "глюкоза в сыворотке",
     ],
   },
   {
@@ -371,6 +378,11 @@ export const ANALYTE_ALIASES: readonly AnalyteAliases[] = [
       "hemoglobina glikowana",
       "glikohemoglobina",
       "당화혈색소",
+      "гликированныи гемоглобин",
+      "гликозилированныи гемоглобин",
+      "гликогемоглобин",
+      "гемоглобин a1c",
+      "гликированныи гемоглобин a1c",
     ],
   },
   {
@@ -384,6 +396,10 @@ export const ANALYTE_ALIASES: readonly AnalyteAliases[] = [
       "colesterol",
       "colesterolo",
       "cholesterol calkowity",
+      "холестерин",
+      "холестерин общии",
+      "общии холестерин",
+      "хс общии",
     ],
   },
   {
@@ -399,6 +415,11 @@ export const ANALYTE_ALIASES: readonly AnalyteAliases[] = [
       "ldlch",
       "cholesterol ldl",
       "저밀도 콜레스테롤",
+      "лпнп",
+      "холестерин лпнп",
+      "хс лпнп",
+      "лпнп холестерин",
+      "холестерин липопротеинов низкои плотности",
     ],
   },
   {
@@ -411,6 +432,11 @@ export const ANALYTE_ALIASES: readonly AnalyteAliases[] = [
       "hdlch",
       "cholesterol hdl",
       "고밀도 콜레스테롤",
+      "лпвп",
+      "холестерин лпвп",
+      "хс лпвп",
+      "лпвп холестерин",
+      "холестерин липопротеинов высокои плотности",
     ],
   },
   {
@@ -432,6 +458,9 @@ export const ANALYTE_ALIASES: readonly AnalyteAliases[] = [
       "creat",
       "creatinina sierica",
       "혈청 크레아티닌",
+      "креатинин",
+      "креатинин в сыворотке",
+      "креатинин сыворотки",
     ],
   },
   {
@@ -459,9 +488,27 @@ export const ANALYTE_ALIASES: readonly AnalyteAliases[] = [
       "25 hydroksy witamina d3",
       "kalcydiol",
       "25 hydroksykolekalciferol",
+      "витамин d",
+      "витамин д",
+      "25 oh витамин d",
+      "витамин d 25 oh",
+      "25 гидроксивитамин d",
+      "25 гидроксикальциферол",
+      "кальцидиол",
+      "кальцифедиол",
     ],
   },
-  { key: "urea", names: ["urea", "harnstoff", "uree", "urea serum"] },
+  {
+    key: "urea",
+    names: [
+      "urea",
+      "harnstoff",
+      "uree",
+      "urea serum",
+      "мочевина",
+      "мочевина в сыворотке",
+    ],
+  },
   {
     key: "blood-urea-nitrogen",
     names: [
@@ -471,6 +518,8 @@ export const ANALYTE_ALIASES: readonly AnalyteAliases[] = [
       "harnstoff stickstoff",
       "stickstoff harnstoff",
       "azote ureique",
+      "азот мочевины",
+      "азот мочевины крови",
     ],
   },
   {
@@ -482,6 +531,7 @@ export const ANALYTE_ALIASES: readonly AnalyteAliases[] = [
       "acide urique",
       "acido urico",
       "kwas moczowy",
+      "мочевая кислота",
     ],
   },
   {
@@ -497,6 +547,9 @@ export const ANALYTE_ALIASES: readonly AnalyteAliases[] = [
       "gesamtkalzium",
       "calcio",
       "wapn",
+      "кальции",
+      "кальции общии",
+      "общии кальции",
     ],
   },
   {
@@ -526,6 +579,9 @@ export const ANALYTE_ALIASES: readonly AnalyteAliases[] = [
       "bilirubina totale",
       "bilirubina całkowita",
       "총 빌리루빈",
+      "билирубин",
+      "билирубин общии",
+      "общии билирубин",
     ],
   },
 ];
@@ -544,6 +600,12 @@ export const ANALYTE_ALIASES: readonly AnalyteAliases[] = [
  * laboratory or clinical reference; a shorthand that names two analytes in
  * different places ("PCR", "AP" outside German reports, "Cr") is left out,
  * because a wrong automatic match moves a reading into the wrong history.
+ *
+ * Both lists also carry Russian names, though no Russian interface ships: the
+ * language of a report is not the language of the account, and the localised
+ * seed names only cover the shipped locales. A seed with no other entry
+ * (`apob`, `lp-a`, `fasting-insulin`, `folate`, `transferrin-saturation`)
+ * gets its Russian names here.
  */
 export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
   {
@@ -563,6 +625,8 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "fosfataza alkaliczna",
       "fosfataza zasadowa",
       "알칼리인산분해효소",
+      "щелочная фосфатаза",
+      "щф",
     ],
   },
   {
@@ -584,6 +648,9 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "혈청gpt",
       "알라닌아미노전달효소",
       "알라닌아미노전이효소",
+      "алт",
+      "алат",
+      "аланинаминотрансфераза",
     ],
   },
   {
@@ -606,6 +673,9 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "혈청got",
       "아스파테이트아미노전달효소",
       "아스파테이트아미노전이효소",
+      "аст",
+      "асат",
+      "аспартатаминотрансфераза",
     ],
   },
   {
@@ -628,6 +698,11 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "r gtp",
       "감마 gtp",
       "감마글루타밀전이효소",
+      "ггт",
+      "ггтп",
+      "гамма гт",
+      "гамма глутамилтрансфераза",
+      "гамма глутамилтранспептидаза",
     ],
   },
   {
@@ -645,6 +720,8 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "lattato deidrogenasi",
       "dehydrogenaza mleczanowa",
       "젖산탈수효소",
+      "лдг",
+      "лактатдегидрогеназа",
     ],
   },
   {
@@ -660,6 +737,9 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "proteina c reattiva",
       "białko c reaktywne",
       "c 반응성 단백",
+      "с реактивныи белок",
+      "c реактивныи белок",
+      "срб",
     ],
   },
   {
@@ -683,6 +763,11 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "crp wysoko czułe",
       "crp ultra czułe",
       "wysoko czułe białko c reaktywne",
+      "с реактивныи белок высокочувствительныи",
+      "c реактивныи белок высокочувствительныи",
+      "высокочувствительныи с реактивныи белок",
+      "срб высокочувствительныи",
+      "вч срб",
     ],
   },
   {
@@ -704,6 +789,8 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "tyreotropina",
       "hormon tyreotropowy",
       "갑상선자극호르몬",
+      "ттг",
+      "тиреотропныи гормон",
     ],
   },
   {
@@ -720,6 +807,12 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "t3l",
       "triiodotironina libera",
       "wolna t3",
+      "т3 свободныи",
+      "свободныи т3",
+      "трииодтиронин свободныи",
+      "свободныи трииодтиронин",
+      "t3 свободныи",
+      "свободныи t3",
     ],
   },
   {
@@ -739,6 +832,12 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "tiroxina libera",
       "wolna t4",
       "유리 싸이록신",
+      "т4 свободныи",
+      "свободныи т4",
+      "тироксин свободныи",
+      "свободныи тироксин",
+      "t4 свободныи",
+      "свободныи t4",
     ],
   },
   {
@@ -762,11 +861,15 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "신사구체여과율 (e gfr)",
       "e gfr",
       "신사구체여과율",
+      "скф",
+      "рскф",
+      "расчетная скф",
+      "скорость клубочковои фильтрации",
     ],
   },
   {
     key: "hemoglobin",
-    names: ["hb", "hgb", "hemogl", "hemoglobine", "혈색소"],
+    names: ["hb", "hgb", "hemogl", "hemoglobine", "혈색소", "гемоглобин"],
   },
   {
     key: "hematocrit",
@@ -779,6 +882,7 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "hto",
       "ht",
       "적혈구용적률",
+      "гематокрит",
     ],
   },
   {
@@ -791,12 +895,22 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "vgm",
       "volume globulaire moyen",
       "평균적혈구용적",
+      "среднии объем эритроцита",
+      "среднии объем эритроцитов",
     ],
   },
   {
     // "Hb/E" is Labor Limbach's code for MCH, not haemoglobin.
     key: "mch",
-    names: ["mch", "hb e", "hcm", "tcmh", "tgmh", "평균적혈구혈색소량"],
+    names: [
+      "mch",
+      "hb e",
+      "hcm",
+      "tcmh",
+      "tgmh",
+      "평균적혈구혈색소량",
+      "среднее содержание гемоглобина в эритроците",
+    ],
   },
   {
     key: "mchc",
@@ -807,6 +921,8 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "cgmh",
       "평균적혈구 헤모글로빈농도",
       "평균 적혈구혈색소 농도",
+      "средняя концентрация гемоглобина в эритроците",
+      "средняя концентрация гемоглобина в эритроцитах",
     ],
   },
   {
@@ -824,6 +940,7 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "hematies",
       "liczba erytrocytow",
       "적혈구",
+      "эритроциты",
     ],
   },
   {
@@ -839,6 +956,7 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "leucocytes",
       "liczba leukocytow",
       "백혈구",
+      "леикоциты",
     ],
   },
   {
@@ -858,6 +976,7 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "liczba trombocytow",
       "platelet",
       "혈소판",
+      "тромбоциты",
     ],
   },
   {
@@ -874,6 +993,7 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "trigliceridi",
       "triglicerydy",
       "중성지방",
+      "триглицериды",
     ],
   },
   {
@@ -886,6 +1006,7 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "ferritine",
       "ferritina sierica",
       "ferrytyna",
+      "ферритин",
     ],
   },
   {
@@ -901,11 +1022,24 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "vitamina b12",
       "witamina b12",
       "kobalamina",
+      "витамин b12",
+      "витамин в12",
+      "цианокобаламин",
+      "кобаламин",
     ],
   },
   {
     key: "sodium",
-    names: ["na", "na+", "natrium", "sodium", "sodio", "natremie", "소디움"],
+    names: [
+      "na",
+      "na+",
+      "natrium",
+      "sodium",
+      "sodio",
+      "natremie",
+      "소디움",
+      "натрии",
+    ],
   },
   {
     // A bare "K" only ever reaches a potassium marker whose unit the reading
@@ -921,6 +1055,37 @@ export const LAB_NAME_ALIASES: readonly AnalyteAliases[] = [
       "potas",
       "kaliemie",
       "포타슘",
+      "калии",
+    ],
+  },
+  {
+    key: "apob",
+    names: ["аполипопротеин b", "аполипопротеин в", "апо b", "апо в"],
+  },
+  {
+    key: "lp-a",
+    names: [
+      "липопротеин (а)",
+      "липопротеин (a)",
+      "липопротеин а",
+      "лп (а)",
+      "лп(а)",
+    ],
+  },
+  {
+    key: "fasting-insulin",
+    names: ["инсулин", "инсулин натощак"],
+  },
+  {
+    key: "folate",
+    names: ["фолиевая кислота", "фолаты", "фолат"],
+  },
+  {
+    key: "transferrin-saturation",
+    names: [
+      "насыщение трансферрина",
+      "насыщение трансферрина железом",
+      "коэффициент насыщения трансферрина",
     ],
   },
 ];

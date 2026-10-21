@@ -107,6 +107,10 @@ describe("the catalog's shorthand (D1223)", () => {
   });
 
   it("keeps the standard and the high-sensitivity CRP apart", () => {
+    expect(catalogKeyForName("С-реактивный белок")).toBe("crp");
+    expect(catalogKeyForName("С-реактивный белок высокочувствительный")).toBe(
+      "hs-crp",
+    );
     expect(catalogKeyForName("CRP")).not.toBe(catalogKeyForName("hs-CRP"));
   });
 
@@ -282,5 +286,68 @@ describe("suggestions", () => {
     expect(nameSimilarity("Ferritin", "ferritin")).toBe(1);
     expect(nameSimilarity("alk phos", "alkaline phosphatase")).toBe(0.8);
     expect(nameSimilarity("LDL", "Ferritin")).toBeLessThan(0.5);
+  });
+});
+
+describe("names on Russian-language reports", () => {
+  it.each([
+    ["Глюкоза", "fasting-glucose"],
+    ["Гликированный гемоглобин", "hba1c"],
+    ["Холестерин общий", "total-cholesterol"],
+    ["Холестерин ЛПНП", "ldl"],
+    ["ХС ЛПВП", "hdl"],
+    ["Триглицериды", "triglycerides"],
+    ["Креатинин", "creatinine"],
+    ["Мочевина", "urea"],
+    ["Мочевая кислота", "uric-acid"],
+    ["АЛТ", "alt"],
+    ["АсАТ", "ast"],
+    ["Гамма-ГТ", "ggt"],
+    ["Щелочная фосфатаза", "alkaline-phosphatase"],
+    ["Билирубин общий", "bilirubin-total"],
+    ["Т4 свободный", "ft4"],
+    ["Свободный T3", "ft3"],
+    ["Ферритин", "ferritin"],
+    ["Витамин B12", "vitamin-b12"],
+    ["25-OH витамин D", "vitamin-d"],
+    ["Гемоглобин", "hemoglobin"],
+    ["Лейкоциты", "wbc"],
+    ["Тромбоциты", "platelets"],
+    ["Калий", "potassium"],
+    ["Натрий", "sodium"],
+    ["Кальций общий", "calcium-total"],
+    ["СКФ", "egfr"],
+    // Seeds that had no other names before.
+    ["Аполипопротеин B", "apob"],
+    ["Липопротеин (а)", "lp-a"],
+    ["Инсулин", "fasting-insulin"],
+    ["Фолиевая кислота", "folate"],
+    ["Насыщение трансферрина железом", "transferrin-saturation"],
+  ])("%s is %s", (name, key) => {
+    expect(catalogKeyForName(name)).toBe(key);
+  });
+
+  it.each([
+    ["Глюкоза (сыворотка)", "fasting-glucose"],
+    ["Креатинин (в сыворотке)", "creatinine"],
+    ["Билирубин (общий)", "bilirubin-total"],
+    ["Тиреотропный гормон (ТТГ)", "tsh"],
+    ["Гемоглобин (HGB)", "hemoglobin"],
+    ["Аланинаминотрансфераза (АЛТ)", "alt"],
+  ])("%s, with its parenthetical, is %s", (name, key) => {
+    expect(catalogKeyForName(name)).toBe(key);
+  });
+
+  it.each([
+    // Another specimen or another test, never the catalog analyte.
+    ["Глюкоза (моча)"],
+    ["Глюкоза в моче"],
+    ["Креатинин в моче"],
+    ["Билирубин прямой"],
+    ["Билирубин непрямой"],
+    ["Кальций ионизированный"],
+    ["Тиреотропный гормон (Т4)"],
+  ])("%s is no catalog name", (name) => {
+    expect(catalogKeyForName(name)).toBeNull();
   });
 });
