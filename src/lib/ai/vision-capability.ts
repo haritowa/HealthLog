@@ -101,6 +101,12 @@ function codexSupportsVision(model: string): boolean {
     // "-codex is text-only" exclusion was stale — the wire reads images on
     // these slugs, so lab-OCR and document reads both succeed on a `-codex` pin.
     m.startsWith("gpt-5") ||
+    // The GPT-6 line (`gpt-6.1-sol`, `gpt-6-luna`) is what the Codex backend
+    // accepts on ChatGPT plans that refuse every 5.x slug, so a `CODEX_MODEL`
+    // pin onto it is the only working configuration there. Treated as
+    // multimodal like the 5.x line; without it the document reads and lab OCR
+    // disappear for those accounts even though the text path works.
+    m.startsWith("gpt-6") ||
     m.startsWith("gpt-4o") ||
     m.startsWith("gpt-4.1") ||
     m.startsWith("gpt-4-turbo") ||
