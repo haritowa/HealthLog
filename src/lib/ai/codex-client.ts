@@ -51,7 +51,8 @@ import {
 const CODEX_ENDPOINT = "https://chatgpt.com/backend-api/codex/responses";
 
 /**
- * Default fallback chain — most-current-first as of 2026-06-02. Override
+ * Default fallback chain — most-current-first as of 2026-06-02, then the GPT-6
+ * slugs last on purpose (see their note in the list). Override
  * via `CODEX_MODEL_FALLBACK_CHAIN` (comma-separated) on apps01 if a
  * specific plan ladder needs different ordering. `CODEX_MODEL` is
  * folded into position 0 of the chain when set; duplicates are dropped.

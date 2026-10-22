@@ -82,7 +82,8 @@ function openaiSupportsVision(model: string): boolean {
  * `codex/responses` endpoint (docs/codex-protocol-spec.md §2b) on a multimodal
  * slug — no API key needed. The whole GPT-5.x line is text+vision, including
  * the `-codex` specialist slugs (gpt-5.x-codex); only the legacy `gpt-4`-class
- * non-multimodal pins are text-only. The slug we test is the codex client's
+ * non-multimodal pins are text-only. The GPT-6 line is treated the same way;
+ * unlike the 5.x line, its image input over Codex is not yet verified. The slug we test is the codex client's
  * resolved working slug
  * (cached or chain head), so a slug rotation onto a non-vision model degrades
  * to false rather than 400-ing the user at the image block.
