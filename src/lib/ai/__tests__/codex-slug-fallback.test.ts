@@ -349,6 +349,8 @@ describe("Codex slug fallback chain", () => {
       "gpt-5.4-mini",
       "gpt-5.3-codex",
       "gpt-5.2",
+      "gpt-6.1-sol",
+      "gpt-6-luna",
     ]);
   });
 
@@ -364,6 +366,8 @@ describe("Codex slug fallback chain", () => {
         "gpt-5.4-mini",
         "gpt-5.3-codex",
         "gpt-5.2",
+        "gpt-6.1-sol",
+        "gpt-6-luna",
       ]);
     } finally {
       if (origModel === undefined) delete process.env.CODEX_MODEL;

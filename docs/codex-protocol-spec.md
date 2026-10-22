@@ -633,6 +633,7 @@ Confirmed-accepted slugs on a ChatGPT Plus subscription (per `available_in_plans
 - `gpt-5.5` — HealthLog's default (first chain entry) as of 2026-06
 - `gpt-5.4` / `gpt-5.4-mini` / `gpt-5.2` — accepted per plan
 - `gpt-5.3-codex` — was the default (verified 2026-05-09); the backend rotated off the `-codex` line on 2026-06-02 and this slug is now only accepted intermittently, so it sits on a late chain rung
+- `gpt-6.1-sol` / `gpt-6-luna` — accepted for text on a plan that refuses every 5.x slug (observed 2026-10-20); last on the chain
 
 The `codex-rs/tui/src/model_migration.rs` references to `gpt-5-codex` etc. are _migration prompts_ shown to existing users — they are NOT the slugs sent on the wire after migration. The wire slugs come from `models.json`. Always cross-check `models.json` (`gh api repos/openai/codex/contents/codex-rs/models-manager/models.json`) before picking a default.
 
@@ -651,6 +652,8 @@ const DEFAULT_SLUG_FALLBACK_CHAIN = [
   "gpt-5.4-mini", // documented lighter-weight fallback
   "gpt-5.3-codex", // late rung — still accepted intermittently
   "gpt-5.2", // legacy floor
+  "gpt-6.1-sol", // plans that refuse every 5.x slug take the GPT-6 line
+  "gpt-6-luna",
 ];
 ```
 

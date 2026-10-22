@@ -68,6 +68,11 @@ const DEFAULT_SLUG_FALLBACK_CHAIN = [
   "gpt-5.4-mini", // documented lighter-weight fallback
   "gpt-5.3-codex", // late rung — still accepted intermittently
   "gpt-5.2", // legacy floor
+  // Plans that refuse every 5.x slug above (a 503 "all configured Codex
+  // slugs were rejected") accept the GPT-6 line for text. Last, so a plan
+  // that takes 5.x never reaches them.
+  "gpt-6.1-sol",
+  "gpt-6-luna",
 ] as const;
 
 /**
