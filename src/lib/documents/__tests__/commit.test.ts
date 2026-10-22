@@ -276,7 +276,7 @@ describe("commitApprovedFact — OBSERVATION date when the value states none", (
 
     expect(storedTakenAt().toISOString()).toBe("2021-03-01T12:00:00.000Z");
     expect(prisma.inboundDocument.findFirst).toHaveBeenCalledWith({
-      where: { id: "doc-1", userId: "user-1" },
+      where: { id: "doc-1", userId: "user-1", deletedAt: null },
       select: { reportDate: true, documentDate: true },
     });
   });
@@ -297,6 +297,18 @@ describe("commitApprovedFact — OBSERVATION date when the value states none", (
     await commitApprovedFact("user-1", observationFact());
 
     expect(storedTakenAt().toISOString()).toBe("2021-03-01T12:00:00.000Z");
+  });
+
+  it("skips a stored document date that is not a date", async () => {
+    undated();
+    vi.mocked(prisma.inboundDocument.findFirst).mockResolvedValue({
+      reportDate: new Date("not a date"),
+      documentDate: new Date("2021-02-15T12:00:00.000Z"),
+    } as never);
+
+    await commitApprovedFact("user-1", observationFact());
+
+    expect(storedTakenAt().toISOString()).toBe("2021-02-15T12:00:00.000Z");
   });
 
   it("files the reading under now when neither the value nor the document has a date", async () => {

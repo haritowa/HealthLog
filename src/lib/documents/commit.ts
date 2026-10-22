@@ -65,18 +65,22 @@ export interface CommittedRecordRef {
   recordId: string;
 }
 
+/** A value's own stated day, or null when it states none we can read. */
+function ownDay(date: string | null): string | null {
+  return date && isDateOnlyKey(date) ? date : null;
+}
+
 /**
  * A stated YYYY-MM-DD as the instant a date-only value is stored at (noon
- * UTC), else the fallback date, else now. UTC midnight read back as the
+ * UTC), else the fallback day, else now. UTC midnight read back as the
  * previous day anywhere west of UTC.
  */
 function statedDateOrNow(
   date: string | null,
   fallback: string | null = null,
 ): Date {
-  if (date && isDateOnlyKey(date)) return dateOnlyAtNoonUtc(date);
-  if (fallback) return dateOnlyAtNoonUtc(fallback);
-  return new Date();
+  const day = ownDay(date) ?? ownDay(fallback);
+  return day ? dateOnlyAtNoonUtc(day) : new Date();
 }
 
 /**
@@ -93,7 +97,7 @@ async function documentStatedDay(
   documentId: string,
 ): Promise<string | null> {
   const doc = await prisma.inboundDocument.findFirst({
-    where: { id: documentId, userId },
+    where: { id: documentId, userId, deletedAt: null },
     select: { reportDate: true, documentDate: true },
   });
   if (!doc) {
@@ -102,7 +106,11 @@ async function documentStatedDay(
       "The document this value was read from could not be found",
     );
   }
-  const day = doc.reportDate ?? doc.documentDate;
+  // A stored date that is not a date (a damaged or hand-restored row) counts
+  // as none rather than throwing halfway through a confirm.
+  const day = [doc.reportDate, doc.documentDate].find(
+    (d): d is Date => d instanceof Date && !Number.isNaN(d.getTime()),
+  );
   return day ? dateOnlyKey(day) : null;
 }
 
@@ -361,10 +369,7 @@ export async function commitApprovedFact(
     const observation = data as ObservationFactData;
     // Read before anything is written, so a lookup that fails leaves no
     // minted marker or remembered alias behind.
-    const ownDate =
-      observation.effectiveDate !== null &&
-      isDateOnlyKey(observation.effectiveDate);
-    const documentDay = ownDate
+    const documentDay = ownDay(observation.effectiveDate)
       ? null
       : await documentStatedDay(userId, fact.documentId);
     return commitObservation(userId, observation, choice, documentDay);
