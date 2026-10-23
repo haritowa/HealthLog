@@ -44,7 +44,11 @@ import type {
   MedicationStatementFactData,
   ObservationFactData,
 } from "@/lib/validations/inbound-documents";
-import { dateOnlyAtNoonUtc, isDateOnlyKey } from "@/lib/tz/date-only";
+import {
+  dateOnlyAtNoonUtc,
+  dateOnlyKey,
+  isDateOnlyKey,
+} from "@/lib/tz/date-only";
 
 /** A per-fact commit failure the caller maps to a per-fact 422 entry. */
 export class FactCommitError extends Error {
@@ -61,14 +65,53 @@ export interface CommittedRecordRef {
   recordId: string;
 }
 
+/** A value's own stated day, or null when it states none we can read. */
+function ownDay(date: string | null): string | null {
+  return date && isDateOnlyKey(date) ? date : null;
+}
+
 /**
  * A stated YYYY-MM-DD as the instant a date-only value is stored at (noon
- * UTC), or now when the document states none. UTC midnight read back as the
+ * UTC), else the fallback day, else now. UTC midnight read back as the
  * previous day anywhere west of UTC.
  */
-function statedDateOrNow(date: string | null): Date {
-  if (date && isDateOnlyKey(date)) return dateOnlyAtNoonUtc(date);
-  return new Date();
+function statedDateOrNow(
+  date: string | null,
+  fallback: string | null = null,
+): Date {
+  const day = ownDay(date) ?? ownDay(fallback);
+  return day ? dateOnlyAtNoonUtc(day) : new Date();
+}
+
+/**
+ * The day a value from this document took place when it states none of its
+ * own: the report date the model read off the document, else the document's
+ * filing date, the same order the day view and the timeline place a document
+ * by. A lab report that prints the collection date once in its header carries
+ * no date beside each value, and every reading used to be filed under the day
+ * it was confirmed. A document that cannot be read back fails the commit
+ * rather than falling back to now.
+ */
+async function documentStatedDay(
+  userId: string,
+  documentId: string,
+): Promise<string | null> {
+  const doc = await prisma.inboundDocument.findFirst({
+    where: { id: documentId, userId, deletedAt: null },
+    select: { reportDate: true, documentDate: true },
+  });
+  if (!doc) {
+    throw new FactCommitError(
+      "document.notFound",
+      "The document this value was read from could not be found",
+    );
+  }
+  // A stored date that is not a date (a damaged or hand-restored row) counts
+  // as none rather than throwing halfway through a confirm.
+  const day = [doc.reportDate, doc.documentDate].find(
+    (d): d is Date => d instanceof Date && !Number.isNaN(d.getTime()),
+  );
+  return day ? dateOnlyKey(day) : null;
 }
 
 /**
@@ -84,6 +127,7 @@ async function commitObservation(
   userId: string,
   data: ObservationFactData,
   choice: ObservationChoice = {},
+  documentDay: string | null = null,
 ): Promise<CommittedRecordRef> {
   const isQualitative = typeof data.value !== "number";
   // A numeric reading needs a unit so the catalog has something to mint with —
@@ -228,7 +272,7 @@ async function commitObservation(
       sourceReferenceLow: storedSourceLow,
       sourceReferenceHigh: storedSourceHigh,
       sourceReferenceText: isQualitative ? null : sourceText,
-      takenAt: statedDateOrNow(data.effectiveDate),
+      takenAt: statedDateOrNow(data.effectiveDate, documentDay),
       source: "DOCUMENT",
       noteEncrypted: null,
     },
@@ -322,7 +366,13 @@ export async function commitApprovedFact(
   // structured store. Fail-closed: a bad key id throws and aborts the commit.
   const data = decryptFactData(fact.dataEncrypted);
   if (fact.factType === "OBSERVATION") {
-    return commitObservation(userId, data as ObservationFactData, choice);
+    const observation = data as ObservationFactData;
+    // Read before anything is written, so a lookup that fails leaves no
+    // minted marker or remembered alias behind.
+    const documentDay = ownDay(observation.effectiveDate)
+      ? null
+      : await documentStatedDay(userId, fact.documentId);
+    return commitObservation(userId, observation, choice, documentDay);
   }
   if (fact.factType === "CONDITION") {
     return commitCondition(userId, data as ConditionFactData);
