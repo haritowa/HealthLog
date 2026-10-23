@@ -88,3 +88,56 @@ describe("normaliseLabUnit", () => {
     expect(normaliseLabUnit("MG/DL")).toBe("mg/dL");
   });
 });
+
+describe("sameLabUnit — units written in Cyrillic", () => {
+  it.each([
+    ["нг/мл", "ng/mL"],
+    ["пг/мл", "pg/mL"],
+    ["мг/дл", "mg/dL"],
+    ["г/л", "g/L"],
+    ["ммоль/л", "mmol/L"],
+    ["мкмоль/л", "µmol/L"],
+    ["нмоль/л", "nmol/L"],
+    ["пмоль/л", "pmol/L"],
+    ["мкг/л", "µg/L"],
+    ["мМЕ/л", "mIU/L"],
+    ["мкМЕ/мл", "µIU/mL"],
+    ["МЕ/л", "IU/L"],
+    ["Ед/л", "U/L"],
+    ["фл", "fL"],
+    ["тыс/мкл", "10^3/µL"],
+    ["х10^9/л", "x10^9/L"],
+    ["мм/ч", "mm/h"],
+    [" ммоль / л ", "mmol/l"],
+  ])("%s = %s", (a, b) => {
+    expect(sameLabUnit(a, b)).toBe(true);
+    expect(sameLabUnit(b, a)).toBe(true);
+  });
+
+  it.each([
+    // Grams per litre is not the 10^9/L of a blood count.
+    ["г/л", "G/L"],
+    // International units are not milli-international units.
+    ["МЕ/л", "mIU/L"],
+    ["мМЕ/л", "IU/L"],
+    ["ммоль/л", "µmol/L"],
+    ["нг/мл", "ng/dL"],
+  ])("%s ≠ %s", (a, b) => {
+    expect(sameLabUnit(a, b)).toBe(false);
+    expect(sameLabUnit(b, a)).toBe(false);
+  });
+
+  it("reads only whole words it knows, in their own case", () => {
+    // `Г` is not `г`, and a word that only begins like a unit is not one.
+    expect(normaliseLabUnit("Г/л")).toBe("Г/L");
+    expect(normaliseLabUnit("мгл")).toBe("мгл");
+    expect(normaliseLabUnit("копий/мл")).toBe("копий/mL");
+  });
+
+  it("is idempotent", () => {
+    for (const unit of ["нг/мл", "мкМЕ/мл", "тыс/мкл", "Г/л"]) {
+      const once = normaliseLabUnit(unit);
+      expect(normaliseLabUnit(once)).toBe(once);
+    }
+  });
+});

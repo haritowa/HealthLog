@@ -378,3 +378,24 @@ describe("conversionsFor", () => {
     }
   });
 });
+
+describe("units written in Cyrillic convert like their Latin spelling", () => {
+  it("16.29 нг/мл vitamin D is 40.66 nmol/L", () => {
+    const r = ok(convert("vitamin-d", 16.29, "нг/мл", "nmol/L"));
+    expect(r.value).toBeCloseTo(40.66, 2);
+  });
+
+  it("5.1 ммоль/л glucose is 91.9 mg/dL", () => {
+    const r = ok(convert("fasting-glucose", 5.1, "ммоль/л", "mg/dL"));
+    expect(r.value).toBeCloseTo(91.9, 1);
+  });
+
+  it("80 мкмоль/л creatinine is 0.90 mg/dL", () => {
+    const r = ok(convert("creatinine", 80, "мкмоль/л", "mg/dL"));
+    expect(r.value).toBeCloseTo(0.9, 2);
+  });
+
+  it("scales within a family without an analyte", () => {
+    expect(ok(convert(null, 1, "г/л", "mg/dL")).value).toBe(100);
+  });
+});
