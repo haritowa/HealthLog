@@ -164,6 +164,16 @@ const NEUTRAL_GLOSSES = new Set([
   "sangre",
   "sangue",
   "krew",
+  "сыворотка",
+  "сыворотки",
+  "в сыворотке",
+  "плазма",
+  "плазмы",
+  "кровь",
+  "крови",
+  "общии",
+  "общая",
+  "общее",
 ]);
 
 function lookupWhole(name: string): string | null {
