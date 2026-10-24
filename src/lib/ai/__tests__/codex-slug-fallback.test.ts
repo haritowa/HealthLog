@@ -85,6 +85,47 @@ describe("Codex slug fallback chain", () => {
     clearCodexSlugCache();
   });
 
+  it("an account offered none of the 5.x rungs walks the default ladder to gpt-6.1-sol", async () => {
+    const origModel = process.env.CODEX_MODEL;
+    const origChain = process.env.CODEX_MODEL_FALLBACK_CHAIN;
+    delete process.env.CODEX_MODEL;
+    delete process.env.CODEX_MODEL_FALLBACK_CHAIN;
+    try {
+      const mockFetch = vi.fn();
+      for (let i = 0; i < 5; i++) {
+        mockFetch.mockResolvedValueOnce(rejectionResponse(400));
+      }
+      mockFetch.mockResolvedValueOnce(sseSuccessResponse());
+      vi.stubGlobal("fetch", mockFetch);
+
+      const client = new CodexClient({
+        accessToken: "test",
+        accountId: "acct",
+        onTokenRefresh,
+      });
+      await client.generateCompletion(
+        singleUserTurn({ system: "s", user: "u" }),
+      );
+
+      expect(client.getLastDiagnostics()?.attempted).toEqual([
+        "gpt-5.5",
+        "gpt-5.4",
+        "gpt-5.4-mini",
+        "gpt-5.3-codex",
+        "gpt-5.2",
+        "gpt-6.1-sol",
+      ]);
+      expect(client.getLastDiagnostics()?.workingSlug).toBe("gpt-6.1-sol");
+      expect(getCachedCodexSlug()).toBe("gpt-6.1-sol");
+    } finally {
+      if (origModel === undefined) delete process.env.CODEX_MODEL;
+      else process.env.CODEX_MODEL = origModel;
+      if (origChain === undefined)
+        delete process.env.CODEX_MODEL_FALLBACK_CHAIN;
+      else process.env.CODEX_MODEL_FALLBACK_CHAIN = origChain;
+    }
+  });
+
   it("first slug succeeds — uses head-of-chain and caches it", async () => {
     const mockFetch = vi.fn().mockResolvedValue(sseSuccessResponse());
     vi.stubGlobal("fetch", mockFetch);
@@ -349,6 +390,8 @@ describe("Codex slug fallback chain", () => {
       "gpt-5.4-mini",
       "gpt-5.3-codex",
       "gpt-5.2",
+      "gpt-6.1-sol",
+      "gpt-6-luna",
     ]);
   });
 
@@ -364,6 +407,8 @@ describe("Codex slug fallback chain", () => {
         "gpt-5.4-mini",
         "gpt-5.3-codex",
         "gpt-5.2",
+        "gpt-6.1-sol",
+        "gpt-6-luna",
       ]);
     } finally {
       if (origModel === undefined) delete process.env.CODEX_MODEL;
