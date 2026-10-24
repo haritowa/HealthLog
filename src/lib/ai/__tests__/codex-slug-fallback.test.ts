@@ -85,7 +85,7 @@ describe("Codex slug fallback chain", () => {
     clearCodexSlugCache();
   });
 
-  it("a plan that refuses every 5.x slug walks the default ladder to gpt-6.1-sol", async () => {
+  it("an account offered none of the 5.x rungs walks the default ladder to gpt-6.1-sol", async () => {
     const origModel = process.env.CODEX_MODEL;
     const origChain = process.env.CODEX_MODEL_FALLBACK_CHAIN;
     delete process.env.CODEX_MODEL;

@@ -104,8 +104,8 @@ function codexSupportsVision(model: string): boolean {
     // The GPT-6 line is multimodal too. OpenAI's Codex model bundle
     // (codex-rs/models-manager/models.json) lists every gpt-6 slug with
     // `input_modalities: ["text", "image"]`, and the Codex client keeps image
-    // blocks for such a model. Without this line, an account that only takes
-    // the GPT-6 line loses document reads and lab OCR while its text works.
+    // blocks for such a model. Without this line, an account whose working
+    // model is on the GPT-6 line loses document reads and lab OCR.
     m.startsWith("gpt-6") ||
     m.startsWith("gpt-4o") ||
     m.startsWith("gpt-4.1") ||

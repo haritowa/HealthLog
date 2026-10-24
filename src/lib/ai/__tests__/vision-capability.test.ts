@@ -100,7 +100,7 @@ describe("supportsVisionForConfig", () => {
       "gpt-5-codex",
       "gpt-5.3-codex",
       "gpt-5.1-codex-mini",
-      // The GPT-6 line, the slugs a plan that refuses every 5.x slug accepts.
+      // The GPT-6 line, which an account offered none of the 5.x rungs reaches.
       "gpt-6.1-sol",
       "gpt-6-luna",
     ]) {
