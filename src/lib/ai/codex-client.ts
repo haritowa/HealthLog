@@ -51,8 +51,8 @@ import {
 const CODEX_ENDPOINT = "https://chatgpt.com/backend-api/codex/responses";
 
 /**
- * Default fallback chain — most-current-first as of 2026-06-02, then the GPT-6
- * slugs last on purpose (see their note in the list). Override
+ * Default fallback chain — most-current-first as of 2026-06-02, then the
+ * GPT-6 slugs last on purpose (see their note in the list). Override
  * via `CODEX_MODEL_FALLBACK_CHAIN` (comma-separated) on apps01 if a
  * specific plan ladder needs different ordering. `CODEX_MODEL` is
  * folded into position 0 of the chain when set; duplicates are dropped.
@@ -69,9 +69,9 @@ const DEFAULT_SLUG_FALLBACK_CHAIN = [
   "gpt-5.4-mini", // documented lighter-weight fallback
   "gpt-5.3-codex", // late rung — still accepted intermittently
   "gpt-5.2", // legacy floor
-  // Plans that refuse every 5.x slug above (a 503 "all configured Codex
-  // slugs were rejected") accept the GPT-6 line for text. Last, so a plan
-  // that takes 5.x never reaches them.
+  // A plan that refuses every 5.x slug above (a 503 "all configured Codex
+  // slugs were rejected") was seen to accept the GPT-6 line (2026-10-20).
+  // Last, so a plan that takes 5.x never reaches them.
   "gpt-6.1-sol",
   "gpt-6-luna",
 ] as const;
