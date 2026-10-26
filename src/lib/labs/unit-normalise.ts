@@ -13,7 +13,11 @@
  *   - the micro prefix (`µg/L`, `μg/L` with the Greek mu, `ug/L`, `mcg/L`),
  *   - the case of the litre in the denominator (`mmol/l`, `mg/dl`, `mg/DL`),
  *   - a unit printed entirely in capitals (`MG/DL`, `MMOL/L`), but only for the
- *     short list of units where capitals cannot denote another real unit.
+ *     short list of units where capitals cannot denote another real unit,
+ *   - a unit written in Cyrillic (`нг/мл`, `ммоль/л`, `мМЕ/л`), read word by
+ *     word as its Latin spelling. Only whole words on a fixed list are read,
+ *     with their case, so `г/л` is `g/L` and never `G/L`, and `МЕ/л` is `IU/L`
+ *     and never `mIU/L`. Any other Cyrillic word stays as it is.
  *
  * Case is otherwise significant, on purpose. `mIU/L` and `MIU/L` differ by a
  * factor of a billion (a lone capital M is mega, a lowercase m is milli), and
@@ -44,6 +48,54 @@ const SHOUTED_UNITS: ReadonlyMap<string, string> = new Map(
     "fL",
   ].map((unit) => [unit.toLowerCase(), unit]),
 );
+
+/**
+ * Cyrillic unit words and their Latin spelling, matched as whole words with
+ * their case: `МЕ` (international units) is not `мЕ`, and `г` (grams) is not
+ * `Г`.
+ */
+const CYRILLIC_UNIT_WORDS: ReadonlyMap<string, string> = new Map([
+  ["мкмоль", "µmol"],
+  ["ммоль", "mmol"],
+  ["нмоль", "nmol"],
+  ["пмоль", "pmol"],
+  ["моль", "mol"],
+  ["мкг", "µg"],
+  ["нг", "ng"],
+  ["пг", "pg"],
+  ["мг", "mg"],
+  ["кг", "kg"],
+  ["г", "g"],
+  ["мкл", "µL"],
+  ["мл", "mL"],
+  ["дл", "dL"],
+  ["л", "L"],
+  ["фл", "fL"],
+  ["мкМЕ", "µIU"],
+  ["мМЕ", "mIU"],
+  ["МЕ", "IU"],
+  ["мкЕд", "µU"],
+  ["мЕд", "mU"],
+  ["Ед", "U"],
+  ["ЕД", "U"],
+  ["ед", "U"],
+  ["мм", "mm"],
+  ["ч", "h"],
+  ["сек", "s"],
+  ["тыс", "10^3"],
+  ["млн", "10^6"],
+  // The Cyrillic letter, as in `х10^9/л`.
+  ["х", "x"],
+]);
+
+const CYRILLIC_WORD = /[\u0400-\u04FF]+/g;
+
+function foldCyrillic(text: string): string {
+  return text.replace(
+    CYRILLIC_WORD,
+    (word) => CYRILLIC_UNIT_WORDS.get(word) ?? word,
+  );
+}
 
 const MICRO_SIGNS = /[µμ]/g;
 /** What may follow a spelled-out micro prefix: g, mol, IU, U, L, kat, Eq. */
@@ -79,7 +131,7 @@ function foldLitre(text: string): string {
  * means the same thing, and the (trimmed) string itself otherwise.
  */
 export function normaliseLabUnit(raw: string): string {
-  const spaced = foldSpacing(raw);
+  const spaced = foldCyrillic(foldSpacing(raw));
 
   const hasLowercase = /[a-zµμ]/.test(spaced);
   const hasUppercase = /[A-Z]/.test(spaced);
