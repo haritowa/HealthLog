@@ -66,6 +66,10 @@ describe("typed names", () => {
     ["Calcium", "mg/dL", "calcium-total"],
     ["Gesamtbilirubin", "µmol/L", "bilirubin-total"],
     ["Bilirubin total", "mg/dL", "bilirubin-total"],
+    ["Глюкоза", "mmol/L", "fasting-glucose"],
+    ["Креатинин", "µmol/L", "creatinine"],
+    ["Мочевина", "mmol/L", "urea"],
+    ["Холестерин ЛПНП", "mmol/L", "ldl"],
   ])("%s (%s) is %s", (name, unit, key) => {
     expect(match(name, unit)).toBe(key);
   });
